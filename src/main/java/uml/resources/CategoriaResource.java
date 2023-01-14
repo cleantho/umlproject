@@ -14,7 +14,6 @@ import uml.services.CategoriaService;
 @RequestMapping(value="/categorias")
 public class CategoriaResource {
 	
-	
 	@Autowired
 	private CategoriaService service;
 
