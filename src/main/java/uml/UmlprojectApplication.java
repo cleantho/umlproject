@@ -1,5 +1,6 @@
 package uml;
 
+import java.time.Instant;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import uml.domain.Cidade;
 import uml.domain.Cliente;
 import uml.domain.Endereco;
 import uml.domain.Estado;
+import uml.domain.Pagamento;
+import uml.domain.PagamentoComBoleto;
+import uml.domain.PagamentoComCartao;
+import uml.domain.Pedido;
 import uml.domain.Produto;
 import uml.domain.enums.Pessoa;
+import uml.domain.enums.Status;
 import uml.repositories.CategoriaRepository;
 import uml.repositories.CidadeRepository;
 import uml.repositories.ClienteRepository;
 import uml.repositories.EnderecoRepository;
 import uml.repositories.EstadoRepository;
+import uml.repositories.PagamentoRepository;
+import uml.repositories.PedidoRepository;
 import uml.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -41,6 +49,12 @@ public class UmlprojectApplication implements CommandLineRunner {
 	
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(UmlprojectApplication.class, args);
@@ -88,6 +102,21 @@ public class UmlprojectApplication implements CommandLineRunner {
 		
 		clienteRepository.save(cli1);
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		Pedido ped1 = new Pedido(null, Instant.parse("2022-09-30T10:32:00-03:00"), cli1, e1);
+		Pedido ped2 = new Pedido(null, Instant.parse("2022-10-09T19:35:00-03:00"), cli1, e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, Status.QUITADO, ped1, 6);
+		Pagamento pagto2 = new PagamentoComBoleto(null, Status.PENDENTE, ped2, Instant.parse("2022-10-20T00:00:00-03:00"), null);
+		
+		ped1.setPagamento(pagto1);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+		
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 		
 	}
 
