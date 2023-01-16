@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CollectionTable;
@@ -40,7 +40,7 @@ public class Cliente implements Serializable{
 	private Set<String> telefones = new HashSet<>();
 	
 	@OneToMany(mappedBy = "cliente")
-	@JsonIgnore
+	@JsonBackReference
 	private List<Pedido> pedidos = new ArrayList<>();
 
 	public Cliente() {
