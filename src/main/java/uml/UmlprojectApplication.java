@@ -13,6 +13,7 @@ import uml.domain.Cidade;
 import uml.domain.Cliente;
 import uml.domain.Endereco;
 import uml.domain.Estado;
+import uml.domain.ItemPedido;
 import uml.domain.Pagamento;
 import uml.domain.PagamentoComBoleto;
 import uml.domain.PagamentoComCartao;
@@ -25,6 +26,7 @@ import uml.repositories.CidadeRepository;
 import uml.repositories.ClienteRepository;
 import uml.repositories.EnderecoRepository;
 import uml.repositories.EstadoRepository;
+import uml.repositories.ItemPedidoRepository;
 import uml.repositories.PagamentoRepository;
 import uml.repositories.PedidoRepository;
 import uml.repositories.ProdutoRepository;
@@ -34,27 +36,30 @@ public class UmlprojectApplication implements CommandLineRunner {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;
-	
+
 	@Autowired
 	private ProdutoRepository produtoRepository;
-	
+
 	@Autowired
 	private EstadoRepository estadoRepository;
-	
+
 	@Autowired
 	private CidadeRepository cidadeRepository;
-	
+
 	@Autowired
 	private ClienteRepository clienteRepository;
-	
+
 	@Autowired
 	private EnderecoRepository enderecoRepository;
-	
+
 	@Autowired
 	private PedidoRepository pedidoRepository;
-	
+
 	@Autowired
 	private PagamentoRepository pagamentoRepository;
+
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(UmlprojectApplication.class, args);
@@ -64,34 +69,34 @@ public class UmlprojectApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Categoria cat1 = new Categoria(null, "Informática");
 		Categoria cat2 = new Categoria(null, "Escritório");
-		
+
 		Produto p1 = new Produto(null, "Computador", 2000.00);
 		Produto p2 = new Produto(null, "Impressora", 800.00);
 		Produto p3 = new Produto(null, "Mouse", 80.00);
-		
+
 		cat1.getProdutos().addAll(Arrays.asList(p1, p2, p3));
 		cat2.getProdutos().add(p2);
-		
+
 		p1.getCategorias().add(cat1);
 		p2.getCategorias().addAll(Arrays.asList(cat1, cat2));
 		p3.getCategorias().add(cat1);
-		
+
 		categoriaRepository.saveAll(Arrays.asList(cat1, cat2));
 		produtoRepository.saveAll(Arrays.asList(p1, p2, p3));
-		
+
 		Estado est1 = new Estado(null, "Minas Gerais");
 		Estado est2 = new Estado(null, "São Paulo");
-		
+
 		Cidade c1 = new Cidade(null, "Uberlândia", est1);
 		Cidade c2 = new Cidade(null, "São Paulo", est2);
 		Cidade c3 = new Cidade(null, "Campinas", est2);
-		
+
 		est1.getCidades().add(c1);
 		est2.getCidades().addAll(Arrays.asList(c2, c3));
-		
+
 		estadoRepository.saveAll(Arrays.asList(est1, est2));
 		cidadeRepository.saveAll(Arrays.asList(c1, c2, c3));
-		
+
 		Cliente cli1 = new Cliente(null, "Maria Silva", "maria@gmail.com", "36378912377", Pessoa.PESSOAFISICA);
 		cli1.getTelefones().addAll(Arrays.asList("27363323", "93838393"));
 
@@ -99,25 +104,38 @@ public class UmlprojectApplication implements CommandLineRunner {
 		Endereco e2 = new Endereco(null, "Avenida Matos", "105", "Sala 800", "Centro", "38777012", cli1, c2);
 
 		cli1.getEnderecos().addAll(Arrays.asList(e1, e2));
-		
+
 		clienteRepository.save(cli1);
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
-		
+
 		Pedido ped1 = new Pedido(null, Instant.parse("2022-09-30T10:32:00-03:00"), cli1, e1);
 		Pedido ped2 = new Pedido(null, Instant.parse("2022-10-09T19:35:00-03:00"), cli1, e2);
-		
+
 		Pagamento pagto1 = new PagamentoComCartao(null, Status.QUITADO, ped1, 6);
-		Pagamento pagto2 = new PagamentoComBoleto(null, Status.PENDENTE, ped2, Instant.parse("2022-10-20T00:00:00-03:00"), null);
-		
+		Pagamento pagto2 = new PagamentoComBoleto(null, Status.PENDENTE, ped2,
+				Instant.parse("2022-10-20T00:00:00-03:00"), null);
+
 		ped1.setPagamento(pagto1);
 		ped2.setPagamento(pagto2);
-		
+
 		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
-		
+
 		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
-		
+
 		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
-		
+
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.00);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 100.00, 1, 800.00);
+
+		ped1.getItens().addAll(Arrays.asList(ip1, ip2));
+		ped2.getItens().add(ip3);
+
+		p1.getItens().add(ip1);
+		p2.getItens().add(ip3);
+		p3.getItens().add(ip2);
+
+		itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));
 	}
 
 }
